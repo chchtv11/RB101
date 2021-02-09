@@ -1,0 +1,7 @@
+welcome: Welcome to the Mortgage Calculator!
+loan_amount_prompt: What is the loan amount in dollars? Enter a number without a dollar sign
+annual_rate_prompt: What is the APR (annual percentage rate), expressed as a decimal (e.g. enter 6% as 0.06)
+loan_duration_prompt: What is the duration of the loan in years? Enter a number like 5
+invalid_input: "Sorry that input was invalid. Try again"
+monthly_payment: "Your monthly payment will be:"
+again: "Would you like to calculate again? Enter Y or N"
