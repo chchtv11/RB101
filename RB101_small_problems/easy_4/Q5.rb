@@ -25,16 +25,8 @@ end
 
 def multisum(end_range)
   sum = 0
-  (1..end_range).inject do |sum, n|
-    # puts n
-    # puts sum
-    # puts multiple?(n, 3)
-    # puts multiple?(n, 5)
-    if multiple?(n, 3) || multiple?(n, 5)
-      sum + n
-    else
-      sum
-    end
+  (0..end_range).inject do |sum, n|
+    (multiple?(n, 3) || multiple?(n, 5)) ? sum + n : sum
   end
 end
 

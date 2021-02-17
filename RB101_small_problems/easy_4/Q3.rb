@@ -4,26 +4,27 @@
  # If the year is evenly divisible by 100, then it is not a leap year
  # unless the year is evenly divisible by 400.
 
-# def leap_year?(year)
-#   ((year % 4 == 0) && (year % 100 != 0)) || year % 400 == 0)
-# end
-
 def leap_year?(year)
-  result = false
-  if (year % 4 == 0)
-    result = true
-    puts '4'
-  end
-  if (year % 100 == 0)
-    result = false
-    puts '100'
-  end
-  if (year % 400 == 0)
-    result = true
-    puts '400'
-  end
-  result
+  ((year % 4 == 0) && (year % 100 != 0)) || year % 400 == 0)
 end
+
+# BONUS - make the logic for divisible by 4 first
+# def leap_year?(year)
+#   result = false
+#   if (year % 4 == 0)
+#     result = true
+#     puts '4'
+#   end
+#   if (year % 100 == 0)
+#     result = false
+#     puts '100'
+#   end
+#   if (year % 400 == 0)
+#     result = true
+#     puts '400'
+#   end
+#   result
+# end
 
 leap_year?(2016) == true
 leap_year?(2015) == false

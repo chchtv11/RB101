@@ -1,12 +1,13 @@
 # RB101 - Notes
 
-- % is modulo operator
+- ``%`` is modulo operator
   - Differs from Integer#remainder: modulo returns absolute value. Remainder will return negative if given one
 - Some boolean operators:
-  - !! forces a boolean value eg `!!nil == false`
+  - ``!!`` forces a boolean value eg `!!nil == false`
   - The ^ operator is a bit-wise operator for performing exclusive-or bit operation
     - e.g. `true ^ false == true` (only one value is true)
     - Only works with boolean or number values
+  - a single bang `!` will invert the truthiness. But a double bang `!!` will return the same value `!!true == true`
 
 
 
