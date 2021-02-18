@@ -4,11 +4,12 @@
   - Differs from Integer#remainder: modulo returns absolute value. Remainder will return negative if given one
 - Some boolean operators:
   - ``!!`` forces a boolean value eg `!!nil == false`
-  - The ^ operator is a bit-wise operator for performing exclusive-or bit operation
+  - The `^` operator is a bit-wise operator for performing exclusive-or bit operation
     - e.g. `true ^ false == true` (only one value is true)
     - Only works with boolean or number values
   - a single bang `!` will invert the truthiness. But a double bang `!!` will return the same value `!!true == true`
-
+- Ternary Operator:
+  - `(condition) ? do_if_true : do_if_false`
 
 
 
@@ -39,3 +40,7 @@
 
 - Don't mutate a collection while iterating through it.
   - You can mutate the elements, but not the collection (e.g. don't delete elements)
+
+### Lesson 3
+- Numbers with the same value have the same object_id. Strings do not
+- When you initialize a local variable within an if block, even if that if block doesn’t get executed, the local variable is initialized to nil.
