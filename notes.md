@@ -44,3 +44,7 @@
 ### Lesson 3
 - Numbers with the same value have the same object_id. Strings do not
 - When you initialize a local variable within an if block, even if that if block doesn’t get executed, the local variable is initialized to nil.
+
+
+### Lesson 4
+- take notes on PEDAC: https://launchschool.com/lessons/85376b6d/assignments/2c1146ee
