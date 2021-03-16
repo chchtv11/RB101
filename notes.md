@@ -47,4 +47,60 @@
 
 
 ### Lesson 4
-- take notes on PEDAC: https://launchschool.com/lessons/85376b6d/assignments/2c1146ee
+
+#### PEDAC
+
+**Examples**
+- Might be expected to create your own examples
+
+**Data Structure**
+- Can indicate that the data structure will be an array
+- Since arryas are practically universal, you don't need to wait until the coding step to define truthiness
+- Its still high-level
+
+**Algorithm**
+- Avoid implementation detail
+- Don't write in pseudocode first. Start with plain English
+- Update the algorithm based on changes made during the implementation step, or to make notes from implementation
+- Don't worry about efficiency
+
+**Coding**
+- If using helper method: Write first & test separately
+
+
+#### More Methods
+
+- `each_with_object`: takes a collection object, returns the collection object that was passed in. Object can be an array or hash
+  - ex: `[1, 2, 3].each_with_object([]) { |num, array| array << num }`
+  - Here it is taking an empty array as an argument, then referencing that array in the block as `array`
+  - Adds an element to `array` for each element in `[1, 2, 3]`
+- `include`: Only checks the keys of a hash, not the values
+- `partition`: Divides the elements in the collection up into 2 arrays depending on a condition
+  - Ex: `[true, false, true].partition { |val| val } #==> [[true , true], [false]]`
+
+
+### Lesson 5
+
+#### Nested Data Structures
+
+- If you point to an object within another object, any changes made to that pointer will modify the original object as well. Example: The original object `a` is modified because its elements are reassigned when
+```
+a = [1, 3]
+b = [2]
+arr = [a, b]
+arr # => [[1, 3], [2]]
+
+arr[0][1] = 8 # Side Effect: Reassigns the value of a[1] to 8
+arr # => [[1, 8], [2]]
+a   # => [1, 8]
+```
+
+- Shallow Copy: `dup` and `clone` allow copies of objects to be made, but the elements in the collections they copy are not copied.
+- Example: This will modify both `arr1` and `arr2` because `upcase!` mutates the elements of the array, not the array itself. The elements in `arr1` and `arr2` are still pointing to the same objects.
+```
+arr1 = ["a", "b", "c"]
+arr2 = arr1.dup
+arr2[1].upcase!
+```
+
+- `freeze` can be used to prevent an object from being modified. But it only works on the object it is called on, not any nested objects.
