@@ -4,6 +4,9 @@ require 'pry-byebug'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
+                [[1, 5, 9], [3, 5, 7]]              # diagnonals
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -51,8 +54,26 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def computer_defense(brd)
+  defense_spaces = []
+  WINNING_LINES.each do |line|
+    line_values = line.map { |space| brd[space] }
+    if (line_values.count(PLAYER_MARKER) == 2) & (line_values.count(INITIAL_MARKER) == 1)
+      defense_spaces += line.select { |space| brd[space] == INITIAL_MARKER }
+    end
+  end
+  
+  defense_spaces.sample
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  defense = computer_defense(brd)
+  if !!defense
+    square = defense  
+  else
+    square = empty_squares(brd).sample
+  end
+  
   brd[square] = COMPUTER_MARKER
 end
 
@@ -65,11 +86,7 @@ def someone_won?(brd)
 end
 
 def detect_winner(brd)
-  winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                  [[1, 5, 9], [3, 5, 7]]              # diagnonals
-  
-  winning_lines.each do |line|
+  WINNING_LINES.each do |line|
     line_values = line.map { |square| brd[square] }.uniq
     if line_values == [PLAYER_MARKER]
       return 'Player'
@@ -91,6 +108,8 @@ def joinor(arr, delim=', ', last_delim='or')
     arr.join(delim)
   end
 end
+
+# binding.pry
 
 scores = {'Player' => 0, 'Computer' => 0}
 
