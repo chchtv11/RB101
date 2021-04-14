@@ -104,3 +104,31 @@ arr2[1].upcase!
 ```
 
 - `freeze` can be used to prevent an object from being modified. But it only works on the object it is called on, not any nested objects.
+
+### Lesson 6
+
+#### Pry
+** Using Pry Instead of IRB**
+- Functions the same
+- Can also use command line prompts like so:
+```
+pry
+arr = [1, 2, 3]
+cd arr # changes scope
+ls
+# Will list all methods available to arr
+```
+- can call methods on the object within pry
+- Can also use `show doc method` to see the docs for that method
+
+**Using binding.pry**
+- opens pry at runtime, stopping program
+- pry has access to all variables in the program but doesn't know the values of those assigned below the binding.pry line
+- putting `binding.pry` at the bottom of a method or block will cause the return value to be `nil`
+- if you put it in a loop, it will invoke the binding every time the loop runs
+- `whereami` shows you the line you're on and defaults to 5 lines before & after. Can run `whereami n` to get n lines
+
+**pry-byebug**
+- `require pry-byebug`
+- can use commands `next`, `step`, `continue` to step through code
+- 
