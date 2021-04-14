@@ -92,10 +92,11 @@ def joinor(arr, delim=', ', last_delim='or')
   end
 end
 
+scores = {'Player' => 0, 'Computer' => 0}
+
 loop do
   board = initialize_board
   display_board(board)
-
 
   loop do
     # binding.pry
@@ -111,14 +112,19 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+    winner = detect_winner(board)
+    scores[winner] += 1
+    prompt "#{winner} won this round!"
   else
     prompt "It's a tie!"
   end
+  
+  break if scores.values.max == 5
 
   prompt('Play again? (y or n)')
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
+prompt(scores.select {|_, num| num == 5}.values[0] + ' won the game!')
 prompt('Thanks for playing Tic tac Toe! Good bye!')
