@@ -43,6 +43,21 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def select_first_turn
+  choice = ''
+  loop do 
+    prompt("Who should go first? Enter P for Player, C for Computer, or ? to make it random")
+    choice = gets.chomp.downcase
+    choice = ['p', 'c'].sample if choice.start_with?('?')
+    
+    break if choice.start_with?('p') || choice.start_with?('c')
+    
+    prompt("That's not a valid response.")
+  end
+  
+  choice.chars.first
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -54,25 +69,32 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def computer_defense(brd)
-  defense_spaces = []
+def find_at_risk_square(brd, marker)
+  squares = []
   WINNING_LINES.each do |line|
     line_values = line.map { |space| brd[space] }
-    if (line_values.count(PLAYER_MARKER) == 2) & (line_values.count(INITIAL_MARKER) == 1)
-      defense_spaces += line.select { |space| brd[space] == INITIAL_MARKER }
+    if (line_values.count(marker) == 2) & (line_values.count(INITIAL_MARKER) == 1)
+      squares += line.select { |space| brd[space] == INITIAL_MARKER }
     end
   end
-  
-  defense_spaces.sample
+  squares.sample
 end
 
 def computer_places_piece!(brd)
-  defense = computer_defense(brd)
-  if !!defense
-    square = defense  
-  else
-    square = empty_squares(brd).sample
-  end
+  defense_square = find_at_risk_square(brd, PLAYER_MARKER)
+  offense_square = find_at_risk_square(brd, COMPUTER_MARKER)
+  empty_squares = empty_squares(brd)
+  
+  square = 
+    if !!offense_square
+      offense_square
+    elsif !!defense_square
+      defense_square 
+    elsif empty_squares.include?(5)
+      5
+    else
+      empty_squares.sample
+    end
   
   brd[square] = COMPUTER_MARKER
 end
@@ -115,17 +137,26 @@ scores = {'Player' => 0, 'Computer' => 0}
 
 loop do
   board = initialize_board
-  display_board(board)
+  first_turn = select_first_turn
 
   loop do
-    # binding.pry
-    display_board(board)
+    case first_turn
+    when 'p'
+      display_board(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    
+    when 'c'
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      
+      display_board(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
   end
 
   display_board(board)
@@ -145,5 +176,8 @@ loop do
   break unless answer.downcase.start_with?('y')
 end
 
-prompt(scores.select {|_, num| num == 5}.values[0] + ' won the game!')
+if scores.values.max == 5 
+  prompt(scores.select {|_, num| num == 5}.values[0] + ' won the game!')
+end
+
 prompt('Thanks for playing Tic tac Toe! Good bye!')
