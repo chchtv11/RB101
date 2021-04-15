@@ -15,14 +15,14 @@ end
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
-  
+
   divider_count = 1
-  
+
   brd.keys.each_slice(3).to_a.each do |row|
     puts ROW_SPACER
     puts '  ' + row.map { |space| brd[space] }.join(COL_SPACER)
     puts ROW_SPACER
-    
+
     puts DIVIDER if divider_count <= 2
     divider_count += 1
   end
@@ -40,16 +40,19 @@ end
 
 def select_first_turn
   choice = ''
-  loop do 
-    prompt("Who should go first? Enter P for Player, C for Computer, or ? to make it random")
+  loop do
+    prompt("Who should go first?"\
+      "Enter P for Player,"\
+      "C for Computer,"\
+      "or ? to make it random")
     choice = gets.chomp.downcase
     choice = ['p', 'c'].sample if choice.start_with?('?')
-    
+
     break if choice.start_with?('p') || choice.start_with?('c')
-    
+
     prompt("That's not a valid response.")
   end
-  
+
   choice.chars.first
 end
 
@@ -68,7 +71,8 @@ def find_at_risk_square(brd, marker)
   squares = []
   WINNING_LINES.each do |line|
     line_values = line.map { |space| brd[space] }
-    if (line_values.count(marker) == 2) & (line_values.count(INITIAL_MARKER) == 1)
+    if (line_values.count(marker) == 2) &
+       (line_values.count(INITIAL_MARKER) == 1)
       squares += line.select { |space| brd[space] == INITIAL_MARKER }
     end
   end
@@ -79,18 +83,18 @@ def computer_places_piece!(brd)
   defense_square = find_at_risk_square(brd, PLAYER_MARKER)
   offense_square = find_at_risk_square(brd, COMPUTER_MARKER)
   empty_squares = empty_squares(brd)
-  
-  square = 
+
+  square =
     if !!offense_square
       offense_square
     elsif !!defense_square
-      defense_square 
+      defense_square
     elsif empty_squares.include?(5)
       5
     else
       empty_squares.sample
     end
-  
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -127,19 +131,19 @@ def joinor(arr, delim=', ', last_delim='or')
 end
 
 def place_piece!(board, player)
-  player == 'p' ?  player_places_piece!(board) : computer_places_piece!(board)
+  player == 'p' ? player_places_piece!(board) : computer_places_piece!(board)
 end
 
 def alternate_player(player)
   player == 'p' ? 'c' : 'p'
 end
 
-scores = {'Player' => 0, 'Computer' => 0}
+scores = { 'Player' => 0, 'Computer' => 0 }
 
 loop do
   board = initialize_board
   current_player = select_first_turn
-  
+
   loop do
     display_board(board)
     place_piece!(board, current_player)
@@ -156,7 +160,7 @@ loop do
   else
     prompt "It's a tie!"
   end
-  
+
   break if scores.values.max == 5
 
   prompt('Play again? (y or n)')
@@ -164,8 +168,8 @@ loop do
   break unless answer.downcase.start_with?('y')
 end
 
-if scores.values.max == 5 
-  prompt(scores.select {|_, num| num == 5}.values[0] + ' won the game!')
+if scores.values.max == 5
+  prompt(scores.select { |_, num| num == 5 }.values[0] + ' won the game!')
 end
 
 prompt('Thanks for playing Tic tac Toe! Good bye!')
