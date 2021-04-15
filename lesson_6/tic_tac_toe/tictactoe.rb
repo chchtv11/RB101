@@ -1,37 +1,32 @@
-# require 'pry'
-require 'pry-byebug'
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]]              # diagnonals
+ROW_SPACER = '     |     |'
+COL_SPACER = '  |  '
+DIVIDER = '-----+-----+-----'
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metric/MethodLength, Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
-  spacer = "     |     |"
-  divider = "-----+-----+-----"
   
-  puts spacer
-  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  "
-  puts spacer
-  puts divider
-  puts spacer
-  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}  "
-  puts spacer
-  puts divider
-  puts spacer
-  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}  "
-  puts spacer
+  divider_count = 1
+  
+  brd.keys.each_slice(3).to_a.each do |row|
+    puts ROW_SPACER
+    puts '  ' + row.map { |space| brd[space] }.join(COL_SPACER)
+    puts ROW_SPACER
+    
+    puts DIVIDER if divider_count <= 2
+    divider_count += 1
+  end
 end
-# rubocop:enable Metric/MethodLength, Metrics/AbcSize
 
 def initialize_board
   new_board = {}
@@ -131,32 +126,25 @@ def joinor(arr, delim=', ', last_delim='or')
   end
 end
 
-# binding.pry
+def place_piece!(board, player)
+  player == 'p' ?  player_places_piece!(board) : computer_places_piece!(board)
+end
+
+def alternate_player(player)
+  player == 'p' ? 'c' : 'p'
+end
 
 scores = {'Player' => 0, 'Computer' => 0}
 
 loop do
   board = initialize_board
-  first_turn = select_first_turn
-
+  current_player = select_first_turn
+  
   loop do
-    case first_turn
-    when 'p'
-      display_board(board)
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    
-    when 'c'
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      
-      display_board(board)
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end
+    display_board(board)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
   end
 
   display_board(board)
