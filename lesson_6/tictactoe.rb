@@ -172,4 +172,4 @@ if scores.values.max == 5
   prompt(scores.select { |_, num| num == 5 }.values[0] + ' won the game!')
 end
 
-prompt('Thanks for playing Tic tac Toe! Good bye!')
+prompt('Thanks for playing Tic Tac Toe! Good bye!')

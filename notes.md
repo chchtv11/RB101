@@ -129,6 +129,6 @@ ls
 - `whereami` shows you the line you're on and defaults to 5 lines before & after. Can run `whereami n` to get n lines
 
 **pry-byebug**
-- `require pry-byebug`
+- `require 'pry-byebug'` (do not require pry)
 - can use commands `next`, `step`, `continue` to step through code
 - 
