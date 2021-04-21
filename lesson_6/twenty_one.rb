@@ -10,24 +10,26 @@ require 'pry-byebug'
 # 6. If dealer bust, player wins.
 # 7. Compare cards and declare winner.
 
+SUITS = %w(H C D S)
+VALUES = ('2'..'10').to_a + %w(J Q K A)
 FACE_CARDS = { 'J' => 'Jack',
-                     'Q' => 'Queen',
-                     'K' => 'King',
-                     'A' => 'Ace'}
+               'Q' => 'Queen',
+               'K' => 'King',
+               'A' => 'Ace' }
+
+DIVIDER = "=============="
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
 def initialize_deck
-  suits = %w(H C D S)
-  cards = ('2'..'10').to_a + %w(J Q K A)
   deck = []
-  
-  suits.each do |suit| 
-    cards.each { |card| deck << [suit, card] }
+
+  SUITS.each do |suit|
+    VALUES.each { |value| deck << [suit, value] }
   end
-  
+
   deck
 end
 
@@ -40,16 +42,26 @@ def format_card_name(card)
 end
 
 def join_and(array)
- "#{array[0..-2].join(', ')} and #{array[-1]}"
+  case array.size
+  when 1
+    then array[0]
+  else
+    "#{array[0..-2].join(', ')} and #{array[-1]}"
+  end
 end
 
-def display_cards(dealer_hand, player_hand)
-  prompt("Dealer has: #{format_card_name(dealer_hand[0][1])} and unknown card")
-  prompt("You have: #{join_and(player_hand.map { |card| format_card_name(card[1]) })}")
+def format_hand(hand)
+  join_and(hand.map { |card| format_card_name(card[1]) })
 end
 
-def calculate_ace_value(score, ace_count)
-  score <= (11 - ace_count) ? (score += (10 + ace_count)) : (score += ace_count)
+def display_cards(dealer_hand, player_hand, show_dealer_cards=false)
+  if show_dealer_cards
+    prompt("Dealer has: #{format_hand(dealer_hand)}")
+  else
+    prompt("Dealer has: #{format_hand([dealer_hand[0]])} and unknown card")
+  end
+
+  prompt("You have: #{format_hand(player_hand)}")
 end
 
 def calculate_score(hand)
@@ -57,83 +69,137 @@ def calculate_score(hand)
   card_faces = hand.map { |card| card[1] }
   card_faces.each do |face|
     if %w(K Q J).include?(face)
-      score += 10 
+      score += 10
     elsif face != 'A'
       score += face.to_i
     end
   end
-  
-  calculate_ace_value(score, card_faces.count('A'))
+
+  # Aces
+  card_faces.select { |face| face == 'A' }.count.times do
+    score <= 10 ? (score += 11) : (score += 1)
+  end
+  score
 end
 
 def busted?(hand)
   calculate_score(hand) > 21
 end
 
-def detect_winner(dealer_hand, player_hand)
+def detect_result(dealer_hand, player_hand)
   dealer_score = calculate_score(dealer_hand)
   player_score = calculate_score(player_hand)
-  
-  if player_score == dealer_score
-    prompt("Its a tie!")
-  elsif (21 - dealer_score) < (21 - player_score) 
-    prompt("Dealer won!")
+
+  if player_score > 21
+    :player_busted
+  elsif dealer_score > 21
+    :dealer_busted
+  elsif player_score > dealer_score
+    :player_won
+  elsif dealer_score > player_score
+    :dealer_won
   else
-    prompt("You won!")
+    :tie
   end
 end
 
+def display_result(dealer_hand, player_hand)
+  result = detect_result(dealer_hand, player_hand)
+
+  case result
+  when :player_busted
+    prompt("You busted! Dealer wins!")
+  when :dealer_busted
+    prompt("Dealer busted! You win!")
+  when :player_won
+    prompt("You win!")
+  when :dealer_won
+    prompt("Dealer wins!")
+  when :tie
+    prompt("It's a tie!")
+  end
+end
+
+def play_again?
+  prompt("Do you want to play again? Enter Yes or No")
+  play_again = gets.chomp
+  play_again.downcase.start_with?('y')
+end
+
 # binding.pry
+system 'clear'
+prompt("Welcome to Twenty-One. Let's play!")
+
 loop do
   deck = initialize_deck
   player_hand = deal_cards(deck, 2)
   dealer_hand = deal_cards(deck, 2)
-  
-  display_cards(dealer_hand, player_hand)
-  
+
+  prompt("Dealer has: #{format_hand([dealer_hand[0]])} and unknown card")
+  prompt("You have: #{format_hand(player_hand)}, "\
+         "for a total of: #{calculate_score(player_hand)}")
+
   # Player Turn
   answer = nil
   loop do
-    prompt("hit or stay?")
-    answer = gets.chomp
-    
-    case answer
-      when 'hit'
-        then player_hand += deal_cards(deck, 1)
-        display_cards(dealer_hand, player_hand)
-        break if busted?(player_hand)
-      when 'stay'
-        break
+    # Validate input
+    loop do
+      prompt("hit or stay?")
+      answer = gets.chomp[0].downcase
+      break if ['h', 's'].include?(answer)
+      prompt("That's not a valid response. Try again!")
     end
-    
+
+    system 'clear'
+
+    if answer == 'h'
+      player_hand += deal_cards(deck, 1)
+
+      prompt("You chose to hit!")
+      prompt("Your cards are now: #{format_hand(player_hand)}")
+      prompt("Your total is now: #{calculate_score(player_hand)}")
+    end
+
+    break if busted?(player_hand) || answer == 's'
   end
-  
+
   if busted?(player_hand)
-    prompt("You busted, Dealer won!")
-    break # outer loop
+    display_result(dealer_hand, player_hand)
+    puts DIVIDER
+    play_again? ? next : break
   else
-    prompt("You chose to stay!")
+    system 'clear'
+    prompt("You stayed at #{calculate_score(player_hand)}")
+    puts DIVIDER
+    prompt("Dealer's turn...")
+    prompt("Dealer's cards are: #{format_hand(dealer_hand)}")
   end
-  
+
   # Dealer Turn
   loop do
     break if calculate_score(dealer_hand) >= 17 || busted?(dealer_hand)
+    prompt("Dealer hits!")
     dealer_hand += deal_cards(deck, 1)
-    display_cards(dealer_hand, player_hand)
+    prompt("Dealer's cards are now: #{format_hand(dealer_hand)}")
   end
-  
+
   if busted?(dealer_hand)
-    prompt("Dealer Busted. You win!")
-    break #outer loop
-  else 
-    display_cards(dealer_hand, player_hand)
-    detect_winner(dealer_hand, player_hand)
+    prompt("Dealer total is now: #{calculate_score(dealer_hand)}")
+    display_result(dealer_hand, player_hand)
+    play_again? ? next : break
+  else
+    prompt("Dealer stays at #{calculate_score(dealer_hand)}")
   end
+
+  puts DIVIDER
+  prompt("Dealer has #{format_hand(dealer_hand)}," \
+         "for a total of: #{calculate_score(dealer_hand)}")
+  prompt("Player has #{format_hand(player_hand)}, "\
+         "for a total of: #{calculate_score(player_hand)}")
+  puts DIVIDER
+
+  display_result(dealer_hand, player_hand)
+  break unless play_again?
 end
-  
-  
-  
 
-
-
-  
+prompt("Thanks for playing! Goodbye.")
