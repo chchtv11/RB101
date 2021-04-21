@@ -54,17 +54,17 @@ def format_hand(hand)
   join_and(hand.map { |card| format_card_name(card[1]) })
 end
 
-def display_cards(dealer_hand, player_hand, show_dealer_cards=false)
+def display_cards(dealer_cards, player_cards, show_dealer_cards=false)
   if show_dealer_cards
-    prompt("Dealer has: #{format_hand(dealer_hand)}")
+    prompt("Dealer has: #{format_hand(dealer_cards)}")
   else
-    prompt("Dealer has: #{format_hand([dealer_hand[0]])} and unknown card")
+    prompt("Dealer has: #{format_hand([dealer_cards[0]])} and unknown card")
   end
 
-  prompt("You have: #{format_hand(player_hand)}")
+  prompt("You have: #{format_hand(player_cards)}")
 end
 
-def calculate_score(hand)
+def total(hand)
   score = 0
   card_faces = hand.map { |card| card[1] }
   card_faces.each do |face|
@@ -82,29 +82,26 @@ def calculate_score(hand)
   score
 end
 
-def busted?(hand)
-  calculate_score(hand) > 21
+def busted?(total)
+  total > 21
 end
 
-def detect_result(dealer_hand, player_hand)
-  dealer_score = calculate_score(dealer_hand)
-  player_score = calculate_score(player_hand)
-
-  if player_score > 21
+def detect_result(dealer_total, player_total)
+  if player_total > 21
     :player_busted
-  elsif dealer_score > 21
+  elsif dealer_total > 21
     :dealer_busted
-  elsif player_score > dealer_score
+  elsif player_total > dealer_total
     :player_won
-  elsif dealer_score > player_score
+  elsif dealer_total > player_total
     :dealer_won
   else
     :tie
   end
 end
 
-def display_result(dealer_hand, player_hand)
-  result = detect_result(dealer_hand, player_hand)
+def display_result(dealer_total, player_total)
+  result = detect_result(dealer_total, player_total)
 
   case result
   when :player_busted
@@ -128,16 +125,22 @@ end
 
 # binding.pry
 system 'clear'
-prompt("Welcome to Twenty-One. Let's play!")
+prompt("Welcome to Twenty-One")
 
 loop do
+  prompt("Let's play!")
+  puts DIVIDER
+  
   deck = initialize_deck
-  player_hand = deal_cards(deck, 2)
-  dealer_hand = deal_cards(deck, 2)
+  player_cards = deal_cards(deck, 2)
+  dealer_cards = deal_cards(deck, 2)
+  
+  player_total = total(player_cards)
+  dealer_total = total(dealer_cards)
 
-  prompt("Dealer has: #{format_hand([dealer_hand[0]])} and unknown card")
-  prompt("You have: #{format_hand(player_hand)}, "\
-         "for a total of: #{calculate_score(player_hand)}")
+  prompt("Dealer has: #{format_hand([dealer_cards[0]])} and unknown card")
+  prompt("You have: #{format_hand(player_cards)}, "\
+         "for a total of: #{total(player_cards)}")
 
   # Player Turn
   answer = nil
@@ -153,53 +156,58 @@ loop do
     system 'clear'
 
     if answer == 'h'
-      player_hand += deal_cards(deck, 1)
+      player_cards += deal_cards(deck, 1)
+      player_total = total(player_cards)
 
       prompt("You chose to hit!")
-      prompt("Your cards are now: #{format_hand(player_hand)}")
-      prompt("Your total is now: #{calculate_score(player_hand)}")
+      prompt("Your cards are now: #{format_hand(player_cards)}")
+      prompt("Your total is now: #{total(player_cards)}")
     end
 
-    break if busted?(player_hand) || answer == 's'
+    break if busted?(player_total) || answer == 's'
   end
 
-  if busted?(player_hand)
-    display_result(dealer_hand, player_hand)
+  if busted?(player_total)
+    display_result(dealer_total, player_total)
     puts DIVIDER
     play_again? ? next : break
   else
     system 'clear'
-    prompt("You stayed at #{calculate_score(player_hand)}")
+    prompt("You stayed at #{total(player_cards)}")
     puts DIVIDER
     prompt("Dealer's turn...")
-    prompt("Dealer's cards are: #{format_hand(dealer_hand)}")
+    prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
   end
 
   # Dealer Turn
   loop do
-    break if calculate_score(dealer_hand) >= 17 || busted?(dealer_hand)
+    break if total(dealer_cards) >= 17 || busted?(dealer_total)
+    
+    dealer_cards += deal_cards(deck, 1)
+    dealer_total = total(dealer_cards)
+    
     prompt("Dealer hits!")
-    dealer_hand += deal_cards(deck, 1)
-    prompt("Dealer's cards are now: #{format_hand(dealer_hand)}")
+    prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
   end
 
-  if busted?(dealer_hand)
-    prompt("Dealer total is now: #{calculate_score(dealer_hand)}")
-    display_result(dealer_hand, player_hand)
+  if busted?(dealer_total)
+    prompt("Dealer total is now: #{total(dealer_cards)}")
+    display_result(dealer_total, player_total)
     play_again? ? next : break
   else
-    prompt("Dealer stays at #{calculate_score(dealer_hand)}")
+    prompt("Dealer stays at #{total(dealer_cards)}")
   end
 
   puts DIVIDER
-  prompt("Dealer has #{format_hand(dealer_hand)}," \
-         "for a total of: #{calculate_score(dealer_hand)}")
-  prompt("Player has #{format_hand(player_hand)}, "\
-         "for a total of: #{calculate_score(player_hand)}")
+  prompt("Dealer has #{format_hand(dealer_cards)}, " \
+         "for a total of: #{total(dealer_cards)}")
+  prompt("Player has #{format_hand(player_cards)}, "\
+         "for a total of: #{total(player_cards)}")
   puts DIVIDER
 
-  display_result(dealer_hand, player_hand)
+  display_result(dealer_total, player_total)
   break unless play_again?
+  system 'clear'
 end
 
 prompt("Thanks for playing! Goodbye.")
