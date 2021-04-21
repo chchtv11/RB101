@@ -123,6 +123,17 @@ def play_again?
   play_again.downcase.start_with?('y')
 end
 
+def end_round(dealer_cards, player_cards, dealer_total, player_total)
+  puts DIVIDER
+  prompt("Dealer has #{format_hand(dealer_cards)}, " \
+         "for a total of: #{dealer_total}")
+  prompt("Player has #{format_hand(player_cards)}, "\
+         "for a total of: #{player_total}")
+  puts DIVIDER
+  
+  display_result(dealer_total, player_total)
+end
+
 # binding.pry
 system 'clear'
 prompt("Welcome to Twenty-One")
@@ -140,7 +151,7 @@ loop do
 
   prompt("Dealer has: #{format_hand([dealer_cards[0]])} and unknown card")
   prompt("You have: #{format_hand(player_cards)}, "\
-         "for a total of: #{total(player_cards)}")
+         "for a total of: #{player_total}")
 
   # Player Turn
   answer = nil
@@ -148,8 +159,11 @@ loop do
     # Validate input
     loop do
       prompt("hit or stay?")
-      answer = gets.chomp[0].downcase
-      break if ['h', 's'].include?(answer)
+      answer = gets.chomp
+      if answer.downcase.start_with?('h', 's')
+        answer = answer.downcase[0]
+        break
+      end
       prompt("That's not a valid response. Try again!")
     end
 
@@ -161,19 +175,18 @@ loop do
 
       prompt("You chose to hit!")
       prompt("Your cards are now: #{format_hand(player_cards)}")
-      prompt("Your total is now: #{total(player_cards)}")
+      prompt("Your total is now: #{player_total}")
     end
 
     break if busted?(player_total) || answer == 's'
   end
 
   if busted?(player_total)
-    display_result(dealer_total, player_total)
-    puts DIVIDER
+    end_round(dealer_cards, player_cards, dealer_total, player_total)
     play_again? ? next : break
   else
     system 'clear'
-    prompt("You stayed at #{total(player_cards)}")
+    prompt("You stayed at #{player_total}")
     puts DIVIDER
     prompt("Dealer's turn...")
     prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
@@ -181,7 +194,7 @@ loop do
 
   # Dealer Turn
   loop do
-    break if total(dealer_cards) >= 17 || busted?(dealer_total)
+    break if dealer_total >= 17 || busted?(dealer_total)
     
     dealer_cards += deal_cards(deck, 1)
     dealer_total = total(dealer_cards)
@@ -190,22 +203,9 @@ loop do
     prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
   end
 
-  if busted?(dealer_total)
-    prompt("Dealer total is now: #{total(dealer_cards)}")
-    display_result(dealer_total, player_total)
-    play_again? ? next : break
-  else
-    prompt("Dealer stays at #{total(dealer_cards)}")
-  end
-
-  puts DIVIDER
-  prompt("Dealer has #{format_hand(dealer_cards)}, " \
-         "for a total of: #{total(dealer_cards)}")
-  prompt("Player has #{format_hand(player_cards)}, "\
-         "for a total of: #{total(player_cards)}")
-  puts DIVIDER
-
-  display_result(dealer_total, player_total)
+  prompt("Dealer stays at #{dealer_total}") if !busted?(dealer_total)
+  
+  end_round(dealer_cards, player_cards, dealer_total, player_total)
   break unless play_again?
   system 'clear'
 end
