@@ -7,6 +7,7 @@ VALUES = ('2'..'10').to_a + %w(Jack Queen King Ace)
 DIVIDER = "=============="
 WINNING_TOTAL = 21
 DEALER_MAX = 17
+ROUND_WINS = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -54,6 +55,7 @@ end
 
 def total(hand)
   score = 0
+  
   card_values = hand.map { |card| card[:value] }
   card_values.each do |value|
     if %w(King Queen Jack).include?(value)
@@ -112,19 +114,24 @@ def play_again?
 end
 
 def end_round(dealer_cards, player_cards, totals, wins)
+  sleep(0.5)
   puts DIVIDER
   prompt("Dealer has #{format_hand(dealer_cards)}, " \
          "for a total of: #{totals[:dealer]}")
   prompt("You have #{format_hand(player_cards)}, "\
          "for a total of: #{totals[:player]}")
+  
+  sleep(1)
   puts DIVIDER
-
   display_result(totals)
+  
+  sleep(0.5)
   puts DIVIDER
-
   prompt("Dealer has won #{wins[:dealer]} games")
   prompt("You have won #{wins[:player]} games")
+  
   puts DIVIDER
+  sleep(0.5)
 end
 
 def update_wins!(wins, totals)
@@ -147,10 +154,13 @@ def display_game_winner(wins)
 end
 
 def player_hit(deck, player_cards, totals)
-  player_cards += deck.pop(1)
+  player_cards << deck.pop(1)[0]
   totals[:player] = total(player_cards)
 
   prompt("You chose to hit!")
+  sleep(0.75)
+  
+  return if busted?(totals[:player])
   prompt("Your cards are now: #{format_hand(player_cards)}")
   prompt("Your total is now: #{totals[:player]}")
 end
@@ -162,27 +172,32 @@ def player_turn(deck, dealer_cards, player_cards, totals, wins)
     player_action = get_valid_input("hit or stay?", 'h', 's')
     system 'clear'
     
-    player_hit(deck, player_cards) if player_action == 'h'
+    player_hit(deck, player_cards, totals) if player_action == 'h'
     break if busted?(totals[:player]) || player_action == 's'
   end
   sleep(0.5)
 end
 
 def dealer_turn(deck, dealer_cards, totals)
+  sleep(0.5)
   prompt("Dealer's turn...")
+  sleep(0.5)
   prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
   prompt("Dealer's total is: #{totals[:dealer]}")
   loop do
+    sleep(0.5)
     break if totals[:dealer] >= DEALER_MAX || busted?(totals[:dealer])
 
-    dealer_cards += deck.pop(1)
+    dealer_cards << deck.pop(1)[0]
     totals[:dealer] = total(dealer_cards)
 
     prompt("Dealer hits!")
+    sleep(0.5)
     prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
     prompt("Dealer's total is now: #{totals[:dealer]}")
   end
 
+  sleep(0.5)
   prompt("Dealer stays at #{totals[:dealer]}") if !busted?(totals[:dealer])
 end
 
@@ -210,15 +225,18 @@ loop do
   prompt("Dealer has: #{format_hand([dealer_cards[0]])} and unknown card")
   prompt("You have: #{format_hand(player_cards)}, "\
          "for a total of: #{totals[:player]}")
-
+         
   player_turn(deck, dealer_cards, player_cards, totals, wins)
   if busted?(totals[:player])
     update_wins!(wins, totals)
     end_round(dealer_cards, player_cards, totals, wins)
 
-    break if wins.values.max >= 5
+    break if wins.values.max >= ROUND_WINS
+    
+    sleep(0.5)
     play_again? ? next : break
   else
+    sleep(0.5)
     system 'clear'
     prompt("You stayed at #{totals[:player]}")
     puts DIVIDER
@@ -229,7 +247,7 @@ loop do
   update_wins!(wins, totals)
   end_round(dealer_cards, player_cards, totals, wins)
 
-  break if wins.values.max >= 5
+  break if wins.values.max >= ROUND_WINS
   break unless play_again?
   system 'clear'
 end
