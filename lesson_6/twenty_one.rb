@@ -1,3 +1,7 @@
+require 'yaml'
+MESSAGES = YAML.load_file('twenty_one_messages.yml')
+
+
 SUITS = %w(H C D S)
 VALUES = ('2'..'10').to_a + %w(J Q K A)
 FACE_CARDS = { 'J' => 'Jack',
@@ -11,6 +15,27 @@ DEALER_MAX = 17
 
 def prompt(msg)
   puts "=> #{msg}"
+end
+
+def get_valid_input(message, *start_char)
+  answer = nil
+  loop do
+    prompt(message)
+    answer = gets.strip
+    break if answer.downcase.start_with?(*start_char)
+    prompt("Sorry that's not a valid response.")
+  end
+  answer.downcase[0]
+end
+
+def start_game
+  prompt(MESSAGES['welcome'])
+  
+  display_rules = get_valid_input(MESSAGES['request_rules'], 'y', 'n')
+  prompt(MESSAGES['rules']) if display_rules == 'y'
+  
+  prompt(MESSAGES['start'])
+  gets
 end
 
 def initialize_deck
@@ -91,9 +116,8 @@ def display_result(dealer_total, player_total)
 end
 
 def play_again?
-  prompt("Do you want to play another round? Enter Yes or No")
-  play_again = gets.chomp
-  play_again.downcase.start_with?('y')
+  answer = get_valid_input("Do you want to play another round? Enter Yes or No", 'y', 'n')
+  answer == 'y'
 end
 
 def end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
@@ -132,7 +156,8 @@ def display_game_winner(wins)
 end
 
 system 'clear'
-prompt("Welcome to Twenty-One! The first player to win 5 rounds wins the game.")
+start_game
+sleep(0.5)
 
 wins = {
   player: 0,
@@ -140,9 +165,6 @@ wins = {
 }
 
 loop do
-  prompt("Let's play!")
-  puts DIVIDER
-
   deck = initialize_deck
   player_cards = deck.pop(2)
   dealer_cards = deck.pop(2)
@@ -155,22 +177,13 @@ loop do
          "for a total of: #{player_total}")
 
   # Player Turn
-  answer = nil
+  player_action = nil
   loop do
-    # Validate input
-    loop do
-      prompt("hit or stay?")
-      answer = gets.chomp
-      if answer.downcase.start_with?('h', 's')
-        answer = answer.downcase[0]
-        break
-      end
-      prompt("That's not a valid response. Try again!")
-    end
-
+    player_action = get_valid_input("hit or stay?", 'h', 's')
+    
     system 'clear'
 
-    if answer == 'h'
+    if player_action == 'h'
       player_cards += deck.pop(1)
       player_total = total(player_cards)
 
@@ -179,7 +192,7 @@ loop do
       prompt("Your total is now: #{player_total}")
     end
 
-    break if busted?(player_total) || answer == 's'
+    break if busted?(player_total) || player_action == 's'
   end
 
   if busted?(player_total)

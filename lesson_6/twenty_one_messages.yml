@@ -1,0 +1,37 @@
+welcome: "Welcome to Twenty-One! The first player to win 5 games wins the tournament."
+request_rules: "Do you want to be briefed on the rules? Enter y or n"
+rules: >+
+  RULES:
+  
+  What's the goal? 
+  
+  The goal is to have your cards add up to 21 without going over
+  
+  
+  What are cards worth?
+  
+  - Face cards are worth 10, numbered cards are worth their number value
+ 
+  - Aces are *special* - They are either worth 1 or 11, depending on your total
+  
+  
+  What happens during play?
+  
+  - You and the dealer will both be dealt 2 cards but you will initially only see one of the dealer's cards
+  
+  - Each turn, you choose to hit (add another card) or stay
+  
+  - If you stay, it will be the dealer's turn to hit or stay
+  
+  
+  Who wins?
+  
+  - Whoever busts (goes over 21) loses!
+  
+  - Whoever gets closest to 21 wins!
+  
+  - A tie is also possible
+  
+start: "Are you ready to play? Hit Enter once you are"
+
+  
