@@ -146,6 +146,45 @@ def display_game_winner(wins)
   end
 end
 
+def player_hit(deck, player_cards)
+  player_cards += deck.pop(1)
+  player_total = total(player_cards)
+
+  prompt("You chose to hit!")
+  prompt("Your cards are now: #{format_hand(player_cards)}")
+  prompt("Your total is now: #{player_total}")
+end
+
+def player_turn(deck, dealer_cards, player_cards, dealer_total, player_total, wins)
+   # Player Turn
+  player_action = nil
+  loop do
+    player_action = get_valid_input("hit or stay?", 'h', 's')
+    system 'clear'
+    
+    player_hit(deck, player_cards) if player_action == 'h'
+    break if busted?(player_total) || player_action == 's'
+  end
+end
+
+def dealer_turn(deck, dealer_cards, dealer_total)
+  prompt("Dealer's turn...")
+  prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
+  prompt("Dealer's total is: #{dealer_total}")
+  loop do
+    break if dealer_total >= DEALER_MAX || busted?(dealer_total)
+
+    dealer_cards += deck.pop(1)
+    dealer_total = total(dealer_cards)
+
+    prompt("Dealer hits!")
+    prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
+    prompt("Dealer's total is now: #{dealer_total}")
+  end
+
+  prompt("Dealer stays at #{dealer_total}") if !busted?(dealer_total)
+end
+
 system 'clear'
 start_game
 sleep(0.5)
@@ -167,25 +206,7 @@ loop do
   prompt("You have: #{format_hand(player_cards)}, "\
          "for a total of: #{player_total}")
 
-  # Player Turn
-  player_action = nil
-  loop do
-    player_action = get_valid_input("hit or stay?", 'h', 's')
-    
-    system 'clear'
-
-    if player_action == 'h'
-      player_cards += deck.pop(1)
-      player_total = total(player_cards)
-
-      prompt("You chose to hit!")
-      prompt("Your cards are now: #{format_hand(player_cards)}")
-      prompt("Your total is now: #{player_total}")
-    end
-
-    break if busted?(player_total) || player_action == 's'
-  end
-
+  player_turn(deck, dealer_cards, playercards, dealer_total, player_total, wins)
   if busted?(player_total)
     update_wins!(wins, dealer_total, player_total)
     end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
@@ -196,25 +217,10 @@ loop do
     system 'clear'
     prompt("You stayed at #{player_total}")
     puts DIVIDER
-    prompt("Dealer's turn...")
-    prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
-    prompt("Dealer's total is: #{dealer_total}")
   end
-
-  # Dealer Turn
-  loop do
-    break if dealer_total >= DEALER_MAX || busted?(dealer_total)
-
-    dealer_cards += deck.pop(1)
-    dealer_total = total(dealer_cards)
-
-    prompt("Dealer hits!")
-    prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
-    prompt("Dealer's total is now: #{dealer_total}")
-  end
-
-  prompt("Dealer stays at #{dealer_total}") if !busted?(dealer_total)
-
+  
+  dealer_turn(deck, dealer_cards dealer_total)
+  
   update_wins!(wins, dealer_total, player_total)
   end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
 
