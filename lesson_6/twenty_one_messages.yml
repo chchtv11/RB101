@@ -1,5 +1,15 @@
 welcome: "Welcome to Twenty-One! The first player to win 5 games wins the tournament."
 request_rules: "Do you want to be briefed on the rules? Enter y or n"
+start: "Are you ready to play? Hit Enter once you are"
+play_again: "Do you want to play another round? Enter Yes or No"
+goodbye: "Thanks for playing! Goodbye."
+  
+player_busted: "You busted! Dealer wins!"
+dealer_busted: "Dealer busted! You win!"
+player_won: "You win!"
+dealer_won: "Dealer wins!"
+tie: "It's a tie!"
+
 rules: >+
   RULES:
   
@@ -31,7 +41,4 @@ rules: >+
   - Whoever gets closest to 21 wins!
   
   - A tie is also possible
-  
-start: "Are you ready to play? Hit Enter once you are"
-
   
