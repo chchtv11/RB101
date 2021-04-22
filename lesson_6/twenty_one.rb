@@ -2,13 +2,8 @@ require 'yaml'
 MESSAGES = YAML.load_file('twenty_one_messages.yml')
 
 
-SUITS = %w(H C D S)
-VALUES = ('2'..'10').to_a + %w(J Q K A)
-FACE_CARDS = { 'J' => 'Jack',
-               'Q' => 'Queen',
-               'K' => 'King',
-               'A' => 'Ace' }
-
+SUITS = %w(Hearts Clubs Diamonds Spades)
+VALUES = ('2'..'10').to_a + %w(Jack Queen King Ace)
 DIVIDER = "=============="
 WINNING_TOTAL = 21
 DEALER_MAX = 17
@@ -39,18 +34,13 @@ def start_game
 end
 
 def initialize_deck
-  deck = []
-
-  SUITS.each do |suit|
-    VALUES.each { |value| deck << [suit, value] }
+  deck = SUITS.each_with_object([]) do |suit, deck|
+    VALUES.each { |value| deck << {suit: suit, value: value} }
   end
 
-  deck.shuffle!
+  deck.shuffle
 end
 
-def format_card_name(card)
-  FACE_CARDS.fetch(card, card)
-end
 
 def join_and(array)
   return array[0] if array.size == 1
@@ -59,24 +49,25 @@ def join_and(array)
 end
 
 def format_hand(hand)
-  join_and(hand.map { |card| format_card_name(card[1]) })
+  join_and(hand.map { |card| "#{card[:value]} of #{card[:suit]}" })
 end
 
 def total(hand)
   score = 0
-  card_values = hand.map { |card| card[1] }
+  card_values = hand.map { |card| card[:value] }
   card_values.each do |value|
-    if %w(K Q J).include?(value)
+    if %w(King Queen Jack).include?(value)
       score += 10
-    elsif value != 'A'
+    elsif value != 'Ace'
       score += value.to_i
     end
   end
 
   # Aces
-  card_values.select { |value| value == 'A' }.count.times do
+  card_values.select { |value| value == 'Ace' }.count.times do
     score <= 10 ? (score += 11) : (score += 1)
   end
+  
   score
 end
 
