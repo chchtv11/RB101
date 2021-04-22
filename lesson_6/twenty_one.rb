@@ -75,22 +75,22 @@ def busted?(total)
   total > WINNING_TOTAL
 end
 
-def detect_result(dealer_total, player_total)
-  if player_total > WINNING_TOTAL
+def detect_result(totals)
+  if totals[:player] > WINNING_TOTAL
     :player_busted
-  elsif dealer_total > WINNING_TOTAL
+  elsif totals[:dealer] > WINNING_TOTAL
     :dealer_busted
-  elsif player_total > dealer_total
+  elsif totals[:player] > totals[:dealer]
     :player_won
-  elsif dealer_total > player_total
+  elsif totals[:dealer] > totals[:player]
     :dealer_won
   else
     :tie
   end
 end
 
-def display_result(dealer_total, player_total)
-  result = detect_result(dealer_total, player_total)
+def display_result(totals)
+  result = detect_result(totals)
 
   case result
   when :player_busted
@@ -111,15 +111,15 @@ def play_again?
   answer == 'y'
 end
 
-def end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
+def end_round(dealer_cards, player_cards, totals, wins)
   puts DIVIDER
   prompt("Dealer has #{format_hand(dealer_cards)}, " \
-         "for a total of: #{dealer_total}")
+         "for a total of: #{totals[:dealer]}")
   prompt("You have #{format_hand(player_cards)}, "\
-         "for a total of: #{player_total}")
+         "for a total of: #{totals[:player]}")
   puts DIVIDER
 
-  display_result(dealer_total, player_total)
+  display_result(totals)
   puts DIVIDER
 
   prompt("Dealer has won #{wins[:dealer]} games")
@@ -127,8 +127,8 @@ def end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
   puts DIVIDER
 end
 
-def update_wins!(wins, dealer_total, player_total)
-  result = detect_result(dealer_total, player_total)
+def update_wins!(wins, totals)
+  result = detect_result(totals)
   if [:player_won, :dealer_busted].include?(result)
     wins[:player] += 1
   elsif [:dealer_won, :player_busted].include?(result)
@@ -146,16 +146,16 @@ def display_game_winner(wins)
   end
 end
 
-def player_hit(deck, player_cards)
+def player_hit(deck, player_cards, totals)
   player_cards += deck.pop(1)
-  player_total = total(player_cards)
+  totals[:player] = total(player_cards)
 
   prompt("You chose to hit!")
   prompt("Your cards are now: #{format_hand(player_cards)}")
-  prompt("Your total is now: #{player_total}")
+  prompt("Your total is now: #{totals[:player]}")
 end
 
-def player_turn(deck, dealer_cards, player_cards, dealer_total, player_total, wins)
+def player_turn(deck, dealer_cards, player_cards, totals, wins)
    # Player Turn
   player_action = nil
   loop do
@@ -163,31 +163,34 @@ def player_turn(deck, dealer_cards, player_cards, dealer_total, player_total, wi
     system 'clear'
     
     player_hit(deck, player_cards) if player_action == 'h'
-    break if busted?(player_total) || player_action == 's'
+    break if busted?(totals[:player]) || player_action == 's'
   end
+  sleep(0.5)
 end
 
-def dealer_turn(deck, dealer_cards, dealer_total)
+def dealer_turn(deck, dealer_cards, totals)
   prompt("Dealer's turn...")
   prompt("Dealer's cards are: #{format_hand(dealer_cards)}")
-  prompt("Dealer's total is: #{dealer_total}")
+  prompt("Dealer's total is: #{totals[:dealer]}")
   loop do
-    break if dealer_total >= DEALER_MAX || busted?(dealer_total)
+    break if totals[:dealer] >= DEALER_MAX || busted?(totals[:dealer])
 
     dealer_cards += deck.pop(1)
-    dealer_total = total(dealer_cards)
+    totals[:dealer] = total(dealer_cards)
 
     prompt("Dealer hits!")
     prompt("Dealer's cards are now: #{format_hand(dealer_cards)}")
-    prompt("Dealer's total is now: #{dealer_total}")
+    prompt("Dealer's total is now: #{totals[:dealer]}")
   end
 
-  prompt("Dealer stays at #{dealer_total}") if !busted?(dealer_total)
+  prompt("Dealer stays at #{totals[:dealer]}") if !busted?(totals[:dealer])
 end
 
 system 'clear'
 start_game
-sleep(0.5)
+prompt("Dealing cards...")
+sleep(1)
+system 'clear'
 
 wins = {
   player: 0,
@@ -199,30 +202,32 @@ loop do
   player_cards = deck.pop(2)
   dealer_cards = deck.pop(2)
 
-  player_total = total(player_cards)
-  dealer_total = total(dealer_cards)
+  totals = {
+    player: total(player_cards),
+    dealer: total(dealer_cards)
+  }
 
   prompt("Dealer has: #{format_hand([dealer_cards[0]])} and unknown card")
   prompt("You have: #{format_hand(player_cards)}, "\
-         "for a total of: #{player_total}")
+         "for a total of: #{totals[:player]}")
 
-  player_turn(deck, dealer_cards, player_cards, dealer_total, player_total, wins)
-  if busted?(player_total)
-    update_wins!(wins, dealer_total, player_total)
-    end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
+  player_turn(deck, dealer_cards, player_cards, totals, wins)
+  if busted?(totals[:player])
+    update_wins!(wins, totals)
+    end_round(dealer_cards, player_cards, totals, wins)
 
     break if wins.values.max >= 5
     play_again? ? next : break
   else
     system 'clear'
-    prompt("You stayed at #{player_total}")
+    prompt("You stayed at #{totals[:player]}")
     puts DIVIDER
   end
   
-  dealer_turn(deck, dealer_cards, dealer_total)
+  dealer_turn(deck, dealer_cards, totals)
   
-  update_wins!(wins, dealer_total, player_total)
-  end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
+  update_wins!(wins, totals)
+  end_round(dealer_cards, player_cards, totals, wins)
 
   break if wins.values.max >= 5
   break unless play_again?
