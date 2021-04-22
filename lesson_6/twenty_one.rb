@@ -206,7 +206,7 @@ loop do
   prompt("You have: #{format_hand(player_cards)}, "\
          "for a total of: #{player_total}")
 
-  player_turn(deck, dealer_cards, playercards, dealer_total, player_total, wins)
+  player_turn(deck, dealer_cards, player_cards, dealer_total, player_total, wins)
   if busted?(player_total)
     update_wins!(wins, dealer_total, player_total)
     end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
@@ -219,7 +219,7 @@ loop do
     puts DIVIDER
   end
   
-  dealer_turn(deck, dealer_cards dealer_total)
+  dealer_turn(deck, dealer_cards, dealer_total)
   
   update_wins!(wins, dealer_total, player_total)
   end_round(dealer_cards, player_cards, dealer_total, player_total, wins)
