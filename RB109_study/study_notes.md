@@ -2,9 +2,11 @@
 - re-do precendence lesson
 - Try to understand this: "Don't display something to the output and return a meaningful value. Since Ruby always returns a value, the key here is that the return value shouldn't be the intent of the method." (https://launchschool.com/lessons/a0f3cd44/assignments/aa99ad2d)
 - re-do lesson where we had to break down each line in a chart and explain what was happening
+-re-do problems I got wrong
 
 
 # Prep Videos
+[*Source*](https://launchschool.com/blog/live-session-beginning-ruby)
 
 ## Part 1
 
@@ -92,6 +94,8 @@ If the return value evaluates to `true`, then the element is selected
  
 # Study Tips
 
+[*Source*](https://medium.com/how-i-started-learning-coding-from-scratch/advices-for-109-written-assessment-part-1-6f7fa821cf84)
+
 - Terms/Things to include in code explanations:
     - What *scope* is the variable?
     - *initialized*: "local variable `a` is initialized to a string object with the value `'hello'`"
@@ -137,14 +141,69 @@ a = 'goodbye'
 # References and Mutability in Ruby
 [*Source*](https://launchschool.com/blog/references-and-mutability-in-ruby)
 
-## Understand Variable References
-###Immutable Objects
+### Immutable Objects
 - Any class can be immutable, by simply not providing any methods that alter its state.
 - nil (the only member of the NilClass class) and Range objects (e.g., 1..10) are immutable
 
-###Mutable Objects
-- Indexed assignment is mutating. e.g. `a[0]` will mutate `a`
+### Mutable Objects
 - Collections, such as arrays, have an object ID. Each element in their collection has its own object ID too.
     -  Its possible to modify a collection's elements while keeping the array object ID the same
 -  Strings operate similarly. They don't have a separate object for each character, but the mutability is the same (can change characters without changing the string's object ID)
 -  Concatenation is mutating. `<<` mutates the caller but `+=` doesn't
+- Indexed assignment is mutating. e.g. `a[0]` will mutate `a`
+
+### Object Passing
+- The `caller` of a method call is the object on which the method is called - e.g. `arr` in `arr.uniq`
+
+### Evaluation Strategies
+- Every programming language uses some sort of evaluation strategy when passing objects
+  - determines when expressions are evaluatied and what a method can do with the resulting objects
+- Ruby uses Strict evaluation
+  - every expression is evaluated and converted to a object before it is passed along to a method
+- Most common strict evaluation strategies:
+  - Pass by value
+  - Pass by reference
+- Answers the question "What happens to an object that gets passed to a method?"
+
+**Pass by Value:**
+  - A copy of an object is created and passed around
+  - impossible to change the original object. Can only change the copy
+
+**Pass by Reference:**
+  - A reference to an object is passed around
+  - The argument acts as an alias for the original object. They refer to the same location in memory
+  - If you mutate the argument, you also mutate the original object
+  - Ruby appears to act as pass by reference for mutable objects. But it does not pass by reference for assignment.
+
+**Ruby: Pass by reference value**
+  - Ruby passes around copies of the references
+  - A variable contains a pointer to an object
+  - Assignment changes that pointer, causing the variable to be bound to a different object
+  - Inside a method, we can't change the binding of the original arguments. We can change objects if they are mutable but the references are immutable
+
+# Sorting
+[*Source*](https://launchschool.com/lessons/c53f2250/assignments/2831d0e1)
+
+- Only really used for arrays as they are ordered and have no keys
+- carried out by comparing the items in a collection with each other & ordering them based on the result of that comparison
+- Uses the `<=>` method (called the "spaceship" operator)
+  - Performs a comparison of 2 objects. For `a <=> b` it will return:
+    - `-1`: a less than b
+    - `0`: a equal to b
+    - `1`: a greater than b
+  - Cannot compare different types of objects
+ 
+**ASCII Table**
+ - To determine string comparison, it uses the character's position in the ASCII table
+ - Can use `'a'.ord` to retrieve the ASCII position
+ - General rules:
+  - Upercase comes before lowercase
+  - Digits and (most) punctuation come before letters
+  - Accented/other chars are in the Extended table -- after the main one
+
+**Comparing Arrays Using `<=>`**
+  - Does element-wise comparisons
+    - Returns -1 if any result is -1
+    - Returns 1 if any result is 1
+  - When all results are 0:
+    - Returns -1 if array is smaller
