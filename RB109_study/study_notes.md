@@ -203,7 +203,20 @@ a = 'goodbye'
 
 **Comparing Arrays Using `<=>`**
   - Does element-wise comparisons
-    - Returns -1 if any result is -1
-    - Returns 1 if any result is 1
+    - Returns -1 if any element comparison returns -1
+    - Returns 1 if any rereturns 1
   - When all results are 0:
     - Returns -1 if array is smaller
+
+**Sorting Methods**
+  - `sort` 
+    - By default will sort elements in ascending order
+    - Can also be called with a block. The return value of the block has to be `-1`, `0` or `1`
+  - `sort_by`
+    - Usually called with a block. Comparisons are performed on the return values of the block.
+
+**Sorting Hashes**
+  - Can use `sort_by` with `|key, value|` params in the block
+  - Will return an array. Can convert back to Hash using `to_h`
+  - Can use `<=>` on symbols - they will first be converted to string
+  
