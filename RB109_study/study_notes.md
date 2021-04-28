@@ -184,19 +184,18 @@ a = 'goodbye'
 # Sorting
 [*Source*](https://launchschool.com/lessons/c53f2250/assignments/2831d0e1)
 
-- Only really used for arrays as they are ordered and have no keys
-- carried out by comparing the items in a collection with each other & ordering them based on the result of that comparison
+- Carried out by comparing the items in a collection with each other & ordering them based on the result of that comparison
 - Uses the `<=>` method (called the "spaceship" operator)
-  - Performs a comparison of 2 objects. For `a <=> b` it will return:
+  - Performs a comparison of 2 objects of the same type. For `a <=> b` it will return:
     - `-1`: a less than b
     - `0`: a equal to b
     - `1`: a greater than b
   - Cannot compare different types of objects
  
 **ASCII Table**
- - To determine string comparison, it uses the character's position in the ASCII table
- - Can use `'a'.ord` to retrieve the ASCII position
- - General rules:
+- To determine string comparison, it uses the character's position in the ASCII table
+- Can use `'a'.ord` to retrieve the ASCII position
+- General rules:
   - Upercase comes before lowercase
   - Digits and (most) punctuation come before letters
   - Accented/other chars are in the Extended table -- after the main one
@@ -204,9 +203,11 @@ a = 'goodbye'
 **Comparing Arrays Using `<=>`**
   - Does element-wise comparisons
     - Returns -1 if any element comparison returns -1
-    - Returns 1 if any rereturns 1
+      - e.g. `[1, 0, 3] <=> [1, 1, 3]` returns -1
+    - Returns 1 if any returns 1
   - When all results are 0:
     - Returns -1 if array is smaller
+      - e.g. `[0, 1] <=> [0, 1, 2]` returns -1
 
 **Sorting Methods**
   - `sort` 
@@ -219,4 +220,4 @@ a = 'goodbye'
   - Can use `sort_by` with `|key, value|` params in the block
   - Will return an array. Can convert back to Hash using `to_h`
   - Can use `<=>` on symbols - they will first be converted to string
-  
+
