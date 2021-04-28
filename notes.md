@@ -12,10 +12,6 @@
   - `(condition) ? do_if_true : do_if_false`
 
 
-
-- re-do Precedence lesson
-- Try to understand this: "Don't display something to the output and return a meaningful value. Since Ruby always returns a value, the key here is that the return value shouldn't be the intent of the method." (https://launchschool.com/lessons/a0f3cd44/assignments/aa99ad2d)
-
 ### Pass by value vs Pass by Reference
 - Evaluation strategy: determines when expressions are evaluated, and what a method can do with the resulting objects
   - Ruby uses strict evaluation strategy - every expression is evaluated and converted to an object before it is passed along to a method
@@ -32,7 +28,7 @@
   - Ruby makes copies of the references, then passes those copies to the method
   - The method can use the references to modify the referenced object, but since the reference itself is a copy, the original reference cannot be changed.
 
-##Coding Tips 2
+## Coding Tips 2
 **Methods: Side Effect vs Return**
 - A method can have a side effect (print a value, mutate an object)
 - Or it can return a value
@@ -43,9 +39,10 @@
 
 ### Lesson 3
 - Numbers with the same value have the same object_id. Strings do not
-- When you initialize a local variable within an if block, even if that if block doesn’t get executed, the local variable is initialized to nil.
-
-
+- When you initialize a local variable within an `if` block, even if that `if` block doesn’t get executed, the local variable is initialized to nil.
+  - Ex: `d = 'hello' if 7 == 9`
+  - `d` will return `nil`, not an error
+ 
 ### Lesson 4
 
 #### PEDAC
@@ -55,14 +52,13 @@
 
 **Data Structure**
 - Can indicate that the data structure will be an array
-- Since arryas are practically universal, you don't need to wait until the coding step to define truthiness
-- Its still high-level
+- Since arrays are practically universal, you don't need to wait until the coding step to define this detail, it's still high-level
 
 **Algorithm**
 - Avoid implementation detail
 - Don't write in pseudocode first. Start with plain English
 - Update the algorithm based on changes made during the implementation step, or to make notes from implementation
-- Don't worry about efficiency
+- Don't worry about efficiency yet
 
 **Coding**
 - If using helper method: Write first & test separately
@@ -72,7 +68,7 @@
 
 - `each_with_object`: takes a collection object, returns the collection object that was passed in. Object can be an array or hash
   - ex: `[1, 2, 3].each_with_object([]) { |num, array| array << num }`
-  - Here it is taking an empty array as an argument, then referencing that array in the block as `array`
+  - Here it is taking an empty array as an argument, then referencing that array in the block as the parameter `array`
   - Adds an element to `array` for each element in `[1, 2, 3]`
 - `include`: Only checks the keys of a hash, not the values
 - `partition`: Divides the elements in the collection up into 2 arrays depending on a condition
