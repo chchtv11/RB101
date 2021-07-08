@@ -44,3 +44,15 @@ find_fibonacci_index_by_length(10) == 45
 find_fibonacci_index_by_length(100) == 476
 find_fibonacci_index_by_length(1000) == 4782
 find_fibonacci_index_by_length(10000) == 47847
+
+
+(0..(word.size - 1)).to_a.map do |idx|
+  case idx
+    when 1
+      then word[word.size - 1]
+    when (word.size - 1)
+      then word[1]
+    else
+      word[idx]
+  end
+end.join('')
